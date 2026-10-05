@@ -163,6 +163,7 @@ footer a { color: inherit; }
   border-radius: 0 8px 8px 0;
   padding: 7px 11px;
 }
+.goal.approach { background: #f0fdf4; border-left-color: var(--test-ink); }
 .notation {
   display: flex;
   flex-wrap: wrap;
