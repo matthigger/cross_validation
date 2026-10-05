@@ -20,7 +20,7 @@ const ERR_MAX = 800;
 const ERR_PX = 64;
 
 const LAYOUT = {
-  class: { folds: 178, estLabel: 226, est: 240, height: 372 },
+  class: { folds: 194, estLabel: 242, est: 256, height: 404 },
   reg: { folds: 404, estLabel: 450, est: 486, height: 676 },
 };
 
@@ -67,6 +67,11 @@ function fmt(x, digits = 0) {
 
 function signed(x) { return (x > 0 ? "+" : "") + fmt(x); }
 
+/** Label as SVG text, e.g. "y = 0" with an italic y (sym is y or y-hat). */
+function yText(sym, species) {
+  return `<tspan class="sym">${sym}</tspan> = ${SPECIES.indexOf(species)}`;
+}
+
 function tooltip(p) {
   return `#${p.id} ${p.species}: bill ${p.billLen} × ${p.billDep} mm, `
     + `flipper ${p.flipper} mm, ${fmt(p.mass)} g`;
@@ -92,13 +97,14 @@ function build() {
 
   if (state.mode === "class") {
     svg.append(node("text", { class: "sec", x: X0, y: 16 },
-      "samples (true species)"));
+      `samples (true label <tspan class="sym">y</tspan>)`));
     for (const p of PENGUINS) {
       const g = node("g", { class: "col", "data-i": p.id - 1 }, `
         <title>${tooltip(p)}</title>
         <g transform="translate(-33 24) scale(0.66)">${penguinSVG(p.species)}</g>
         <text class="id" y="138">#${p.id}</text>
-        <text class="name" y="153">${p.species}</text>`);
+        <text class="lab" y="156">${yText("y", p.species)}</text>
+        <text class="name" y="172">${p.species}</text>`);
       els.samples.push(g);
       svg.append(g);
     }
@@ -110,7 +116,7 @@ function build() {
   svg.append(els.folds);
   svg.append(node("text", { class: "sec", x: X0, y: L.estLabel },
     state.mode === "class"
-      ? "estimates per sample"
+      ? `estimates <tspan class="sym">ŷ</tspan> per sample`
       : "error per sample: actual − estimate (g)"));
 
   for (const p of PENGUINS) {
@@ -206,10 +212,11 @@ function classCell(p, guess) {
     ? `<g transform="translate(-33 0) scale(0.66)">${penguinSVG(guess)}</g>`
     : `<rect class="q-box" x="-30" y="2" width="60" height="88" rx="8"/>`;
   return `<title>#${p.id}: estimated ${label}, truly ${p.species}</title>
-    <rect class="hl" x="-38" y="-6" width="76" height="130" rx="10"/>
+    <rect class="hl" x="-38" y="-6" width="76" height="142" rx="10"/>
     ${shape}
-    <text class="name ${ok ? "right" : "wrong"}" y="112">${ok ? "✓" :
-      "✗"} ${label}</text>`;
+    <text class="lab ${ok ? "right" : "wrong"}" y="112">${ok ? "✓" :
+      "✗"} ${guess ? yText("ŷ", guess) : "none"}</text>
+    <text class="name" y="128">${label}</text>`;
 }
 
 function regCell(p, err) {
@@ -299,13 +306,7 @@ function updateReadout() {
       const r = rounds[testRound(i) - 1];
       return r.guess[i] === PENGUINS[i].species;
     }).length;
-    const cents = Object.entries(cur.cents).map(([sp, [l, d]]) =>
-      `<div>${sp}</div><div>${l.toFixed(1)}</div><div>${d.toFixed(1)}</div>`)
-      .join("");
-    h += `<div class="row"><span>Centroids<br><span class="muted">bill
-      length, depth (mm)</span></span><span class="cents">${cents}</span>
-      </div>
-      <div class="row"><span>This round</span><span class="val">
+    h += `<div class="row"><span>This round</span><span class="val">
         ${right(cur.test)} / ${cur.test.length} correct</span></div>
       <div class="row"><span>So far</span><span class="val">
         ${right(seen)} / ${seen.length} correct</span></div>`;
@@ -315,11 +316,8 @@ function updateReadout() {
         ${Math.round(100 * c / N)}%</div>`;
     }
   } else {
-    const { b0, b1 } = cur.line;
     const mse = idx => mean(idx.map(i => rounds[testRound(i) - 1].err[i] ** 2));
-    h += `<div class="row"><span>Line</span><span class="val">&ycirc; =
-      ${fmt(b0)} + ${fmt(b1, 1)} &middot; flipper</span></div>
-      <div class="row"><span>This round</span><span class="val">RMSE
+    h += `<div class="row"><span>This round</span><span class="val">RMSE
         ${fmt(Math.sqrt(mse(cur.test)))} g</span></div>
       <div class="row"><span>So far</span><span class="val">RMSE
         ${fmt(Math.sqrt(mse(seen)))} g</span></div>`;

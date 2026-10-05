@@ -31,9 +31,17 @@
         it.</p>
 
       <div data-show="class">
-        <p><b>Model:</b> nearest centroid. Average the bill length and bill
-          depth of each species in the training folds; estimate a penguin as
-          the species whose average is closest.</p>
+        <div class="notation">
+          <span>Each penguin <i>i</i> has a label
+            <i>y<sub>i</sub></i>:</span>
+          <span class="labels">
+            <span><i>y</i> = 0 Adelie</span>
+            <span><i>y</i> = 1 Chinstrap</span>
+            <span><i>y</i> = 2 Gentoo</span>
+          </span>
+          <span>and an estimate <i>&ycirc;<sub>i</sub></i>, one of the
+            same three.</span>
+        </div>
         <div class="formula">
           CV accuracy = <span class="frac"><span>1</span><span><i>n</i></span></span>
           &sum;<sub><i>i</i></sub> 1[ <i>&ycirc;<sub>i</sub></i> =
@@ -41,11 +49,14 @@
         </div>
       </div>
       <div data-show="reg">
-        <p><b>Model:</b> least squares line, body mass &asymp;
-          <i>&beta;</i><sub>0</sub> + <i>&beta;</i><sub>1</sub> &middot;
-          flipper length, fit on the training folds. Each estimate's error
-          is <i>y<sub>i</sub></i> &minus; <i>&ycirc;<sub>i</sub></i> (actual
-          minus estimate).</p>
+        <div class="notation">
+          <span>Each penguin <i>i</i> has a label <i>y<sub>i</sub></i>:</span>
+          <span class="labels"><span><i>y<sub>i</sub></i> = body mass
+            (g)</span></span>
+          <span>and an estimate <i>&ycirc;<sub>i</sub></i> from its flipper
+            length. The error is <i>y<sub>i</sub></i> &minus;
+            <i>&ycirc;<sub>i</sub></i>.</span>
+        </div>
         <div class="formula">
           CV MSE = <span class="frac"><span>1</span><span><i>n</i></span></span>
           &sum;<sub><i>i</i></sub> (<i>y<sub>i</sub></i> &minus;
@@ -89,11 +100,12 @@
       </div>
       <svg id="stage" aria-label="Cross validation folds and estimates"></svg>
       <div class="species-key" data-show="class">
-        <span><svg viewBox="0 0 100 140"></svg>Adelie: eye rings</span>
-        <span><svg viewBox="0 0 100 140"></svg>Chinstrap: white face, chin
-          strap</span>
-        <span><svg viewBox="0 0 100 140"></svg>Gentoo: crown band, orange
-          bill</span>
+        <span><svg viewBox="0 0 100 140"></svg><b><i>y</i> = 0</b> Adelie: eye
+          rings</span>
+        <span><svg viewBox="0 0 100 140"></svg><b><i>y</i> = 1</b> Chinstrap: white
+          face, chin strap</span>
+        <span><svg viewBox="0 0 100 140"></svg><b><i>y</i> = 2</b> Gentoo: crown
+          band, orange bill</span>
       </div>
     </div>
 
