@@ -22,7 +22,14 @@ deals each species round-robin across the folds. Folds are contiguous
 blocks of the displayed order, so sorted order with k = 3 leaves each
 testing species out of training, and an unlucky shuffle can leave a fold
 short of one: the motivation for stratified folds. The explanation and a
-"Try this" list for the current tab sit above the demo. Arrow keys step back and forward; hovering a sample
+"Try this" list for the current tab sit above the demo.
+
+A Data toggle swaps the twelve penguins: classification offers equal
+species sizes (4/4/4) or unequal (7/3/2), where overall accuracy can hide
+a rare species going undetected (the round panel counts detection per
+species); regression offers the clean set or one with an outlier (#3's
+mass recorded as 4,950 g), which shows up as the largest per-sample error
+and inflates everyone else's error when it is trained on. Arrow keys step back and forward; hovering a sample
 highlights its estimate.
 
 Plain HTML/CSS/JS with SVG: no build step and no dependencies.
@@ -57,7 +64,7 @@ The site then lives at <https://matthigger.github.io/cross_validation/>.
 |------|------|
 | `index.html` | page, explanation text, controls |
 | `style.css` | layout and the training / testing palette |
-| `js/data.js` | the twelve penguins (Gorman, Williams & Fraser 2014) |
+| `js/data.js` | the penguin data sets (Gorman, Williams & Fraser 2014) |
 | `js/penguin.js` | penguin outline per species |
 | `js/cv.js` | fold schemes, nearest centroid, least squares |
 | `js/app.js` | state, drawing, controls, footer build stamp |
