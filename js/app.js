@@ -294,13 +294,13 @@ function updateReadout() {
     </div>
     <div class="row"><span>Training</span><span class="val">${counts}</span>
     </div>
-    <div class="row"><span>Models trained</span><span class="val">
+    <div class="row"><span>Estimators trained</span><span class="val">
       ${state.step} of ${k}, each on ${cur.train.length} penguins</span>
     </div>`;
   if (missing.length) {
     h += `<p class="warn">No ${missing.join(" or ")} in training: ${
       state.mode === "class"
-        ? "the model cannot estimate " + missing.join(" or ") + "."
+        ? "the estimator cannot output " + missing.join(" or ") + "."
         : "the line is fit without " + (missing.length > 1 ? "them" : "it")
           + "."}</p>`;
   }

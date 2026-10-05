@@ -157,6 +157,12 @@ footer a { color: inherit; }
 }
 .intro .card h3, .intro h3 { margin-top: 2px; }
 .intro .formula { margin-bottom: 8px; }
+.goal {
+  background: #f3f6ff;
+  border-left: 3px solid var(--train-ink);
+  border-radius: 0 8px 8px 0;
+  padding: 7px 11px;
+}
 .notation {
   display: flex;
   flex-wrap: wrap;
