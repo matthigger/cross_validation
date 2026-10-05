@@ -304,23 +304,29 @@ button:disabled { opacity: .4; cursor: default; }
 .pg-body, .pg-flipper {
   stroke: var(--ink);
   stroke-width: 2.4;
+  stroke-linejoin: round;
   fill: #fff;
   transition: fill .3s;
 }
 .pg-belly {
   fill: #fff;
-  fill-opacity: .7;
+  fill-opacity: .75;
   stroke: var(--ink);
-  stroke-width: 1.6;
+  stroke-width: 1.8;
 }
 .pg-foot { fill: #fecdd3; stroke: var(--ink); stroke-width: 1.8; }
 .pg-foot.gentoo { fill: #fdba74; }
 .pg-mark { fill: #fff; stroke: var(--ink); stroke-width: 2; }
-.pg-mark.strap { fill: none; stroke-width: 3; stroke-linecap: round; }
-.pg-eye, .pg-bill { fill: var(--ink); }
+.pg-mark.strap { fill: none; stroke-width: 2.6; stroke-linecap: round; }
+.pg-eye { fill: var(--ink); }
 .pg-glint { fill: #fff; }
-.pg-blush { fill: #fb7185; fill-opacity: .45; }
-.pg-bill.gentoo { fill: #f97316; stroke: var(--ink); stroke-width: 1.3; }
+.pg-bill {
+  fill: var(--ink);
+  stroke: var(--ink);
+  stroke-width: 1.2;
+  stroke-linejoin: round;
+}
+.pg-bill.gentoo { fill: #f97316; }
 
 [data-role="train"] .pg-body, [data-role="train"] .pg-flipper {
   fill: var(--train);
