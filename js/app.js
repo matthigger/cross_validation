@@ -3,7 +3,7 @@
 // strip of fold brackets, then one estimate cell per sample. Column j of
 // the strip and the estimates holds the j-th penguin in the current order.
 
-const K_CHOICES = [2, 3, 4, 6, 12];
+const K_CHOICES = [2, 3, 4, 5, 6, 12];
 const DEFAULT_SEED = 3;
 const N = PENGUINS.length;
 const W = 1000;
@@ -32,7 +32,7 @@ const state = {
   step: 0,
 };
 // Derived from k, scheme and seed by recompute().
-let order = [], rounds = [], colOf = [];
+let order = [], rounds = [], colOf = [], foldOf = [];
 
 const svg = document.getElementById("stage");
 const els = {};
@@ -42,6 +42,15 @@ function recompute() {
   rounds = runCV(order, state.k);
   colOf = [];
   order.forEach((i, j) => { colOf[i] = j; });
+  foldOf = [];
+  rounds.forEach((r, f) => r.test.forEach(i => { foldOf[i] = f; }));
+}
+
+/** Describe the fold sizes, e.g. "4 per fold" or "2 or 3 per fold". */
+function perFold() {
+  const sizes = foldSizes(N, state.k);
+  const lo = Math.min(...sizes), hi = Math.max(...sizes);
+  return lo === hi ? `${lo} per fold` : `${lo} or ${hi} per fold`;
 }
 
 function colX(j) { return X0 + CW * (j + 0.5); }
@@ -84,7 +93,7 @@ function role(i) {
 }
 
 /** Round (1-based) in which penguin i is testing. */
-function testRound(i) { return Math.floor(colOf[i] / (N / state.k)) + 1; }
+function testRound(i) { return foldOf[i] + 1; }
 
 // ------------------------------------------------------------------ build
 
@@ -237,17 +246,16 @@ function regCell(p, err) {
 }
 
 function drawFolds(y) {
-  const m = N / state.k;
-  let h = "";
-  for (let f = 0; f < state.k; f++) {
-    const a = X0 + CW * f * m + 5, b = X0 + CW * (f + 1) * m - 5;
+  let h = "", start = 0;
+  foldSizes(N, state.k).forEach((m, f) => {
+    const a = X0 + CW * start + 5, b = X0 + CW * (start += m) - 5;
     const r = state.step === 0 ? "idle"
       : (f === state.step - 1 ? "test" : "train");
     const label = state.k === N ? `${f + 1}` : `fold ${f + 1}`;
     h += `<g class="fold" data-role="${r}">
       <path d="M${a} ${y - 8} V${y} H${b} V${y - 8}"/>
       <text x="${(a + b) / 2}" y="${y + 17}">${label}</text></g>`;
-  }
+  });
   els.folds.innerHTML = h;
 }
 
@@ -271,13 +279,14 @@ function drawFit(cur) {
 
 function updateReadout() {
   const out = document.getElementById("readout");
-  const k = state.k, m = N / k;
+  const k = state.k;
   document.getElementById("round").textContent = state.step === 0
     ? "before CV" : `round ${state.step} of ${k}`;
 
   if (state.step === 0) {
     out.innerHTML = `<h3>Ready</h3>
-      <p><i>n</i> = ${N} penguins in <i>k</i> = ${k} folds of ${m}.
+      <p><i>n</i> = ${N} penguins in <i>k</i> = ${k} folds
+      (${perFold()}).
       Press <b>CV step</b> to run round 1.</p>`;
     return;
   }
@@ -346,9 +355,8 @@ function updateReadout() {
 const kInput = document.getElementById("k");
 
 function updateControls() {
-  const m = N / state.k;
   document.getElementById("kval").textContent = state.k === N
-    ? `k = ${N}, leave-one-out` : `k = ${state.k}, ${m} per fold`;
+    ? `k = ${N} (leave-one-out)` : `k = ${state.k} (${perFold()})`;
   kInput.value = K_CHOICES.indexOf(state.k);
   document.getElementById("back").disabled = state.step === 0;
   document.getElementById("step").disabled = state.step === state.k;

@@ -15,7 +15,8 @@ saw it. Two tabs:
   residuals of the testing fold; the estimates become per-sample errors
   (actual minus estimate). Ends with the CV MSE.
 
-Controls: k (2, 3, 4, 6, or 12 = leave-one-out) and the fold scheme:
+Controls: k (2, 3, 4, 5, 6, or 12 = leave-one-out; at k = 5 the folds hold
+2 or 3) and the fold scheme:
 sorted by species, shuffled, or (classification only) stratified, which
 deals each species round-robin across the folds. Folds are contiguous
 blocks of the displayed order, so sorted order with k = 3 leaves each

@@ -29,7 +29,7 @@
         never test the estimator on a sample it was trained on: that would
         give it an advantage it will not have in practice.</p>
       <p class="goal approach"><b>Approach:</b> split the samples into
-        <i>k</i> equal-size groups, called
+        <i>k</i> groups of (nearly) equal size, called
         <b>folds</b>. Each round holds out one fold for
         <span class="te">testing</span> and trains the estimator on the
         other <i>k</i>&minus;1 (<span class="tr">training</span>). After
@@ -149,7 +149,7 @@
           <button id="reset">Reset</button>
         </div>
         <label class="slider"><span>Folds</span>
-          <input type="range" id="k" min="0" max="4" step="1">
+          <input type="range" id="k" min="0" max="5" step="1">
           <span id="kval" class="val"></span></label>
         <div class="order">
           <span>Order</span>

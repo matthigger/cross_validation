@@ -42,10 +42,19 @@ function sampleOrder(n, scheme, seed, k) {
   return folds.flatMap(f => f.sort((a, b) => rank(a) - rank(b)));
 }
 
-/** Split order into k contiguous folds; k divides n for every k offered. */
+/**
+ * Return the k fold sizes for n samples. When k does not divide n, the
+ * first n % k folds get one extra sample, matching round-robin dealing.
+ */
+function foldSizes(n, k) {
+  return [...Array(k).keys()].map(f =>
+    Math.floor(n / k) + (f < n % k ? 1 : 0));
+}
+
+/** Split order into k contiguous folds of foldSizes(n, k). */
 function makeFolds(order, k) {
-  const m = order.length / k;
-  return [...Array(k).keys()].map(f => order.slice(f * m, (f + 1) * m));
+  let start = 0;
+  return foldSizes(order.length, k).map(m => order.slice(start, start += m));
 }
 
 /**
