@@ -115,8 +115,6 @@ ul.try li { margin: 3px 0; }
   border-bottom: 1px dashed var(--line);
 }
 .readout .row:last-child { border-bottom: 0; }
-.readout .row.stack { display: block; }
-.readout .row.stack .val { display: block; text-align: right; }
 .readout .val { font-weight: 600; white-space: nowrap; }
 .muted { color: var(--muted); font-size: .88em; }
 .buttons { display: flex; flex-wrap: wrap; gap: 8px; margin: 4px 0 10px; }
@@ -273,7 +271,6 @@ button:disabled { opacity: .4; cursor: default; }
   gap: 8px 10px;
 }
 .order #reshuffle { grid-column: 2; justify-self: start; }
-.data-row { margin-top: 10px; }
 .seg {
   display: flex;
   border: 1px solid #cfd4dd;

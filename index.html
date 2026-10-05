@@ -105,32 +105,6 @@
             about 350 g when shuffled. Shuffle the samples before splitting
             them into folds.</details>
         </li>
-        <li data-show="reg">Switch <em>Data</em> to <em>One outlier</em>:
-          one penguin's mass was recorded wrongly. Step through. What
-          happens to its error when it is testing, and to the line (and the
-          other errors) when it is training?
-          <details class="answer"><summary>Answer</summary>Penguin #3 is
-            the outlier. When it is testing, its error is far larger than
-            any other, so the per-sample CV errors flag it. When it is
-            training, it drags the line toward itself and inflates the
-            other penguins' errors, so the CV error rises across the board:
-            with shuffled folds and <i>k</i>&nbsp;=&nbsp;3, an RMSE of about
-            670 g against about 350 g without it. Look for outliers before
-            trusting a CV score; the per-sample errors are a good place to
-            find them.</details>
-        </li>
-        <li data-show="class">Switch <em>Data</em> to <em>Unequal sizes</em>
-          (7 Adelie, 3 Chinstrap, 2 Gentoo), shuffle, and step through,
-          watching <em>Detected so far</em>. Why can the CV accuracy look
-          good while a species goes undetected, and what helps?
-          <details class="answer"><summary>Answer</summary>Adelie are 7 of
-            the 12, so getting them right carries the accuracy even when
-            Chinstrap or Gentoo are missed. With so few of a species, a
-            shuffle can put most of them in one testing fold, leaving too
-            few (or none) to train on. Stratified folds spread each species
-            across the folds, and reporting detection per species, not
-            just overall accuracy, shows the problem.</details>
-        </li>
         <li data-show="class">Set <i>k</i>&nbsp;=&nbsp;12
           (leave-one-out): twelve rounds, each
           testing one penguin, and the result no longer depends on the
@@ -193,19 +167,6 @@
           </div>
           <button id="reshuffle" title="Draw a new random order">&#8635;
             Reshuffle</button>
-        </div>
-        <div class="order data-row">
-          <span>Data</span>
-          <div class="seg" role="radiogroup">
-            <button data-data="equal" role="radio" data-show="class"
-              title="4 Adelie, 4 Chinstrap, 4 Gentoo">Equal sizes</button>
-            <button data-data="unequal" role="radio" data-show="class"
-              title="7 Adelie, 3 Chinstrap, 2 Gentoo">Unequal sizes</button>
-            <button data-data="equal" role="radio" data-show="reg">No
-              outlier</button>
-            <button data-data="outlier" role="radio" data-show="reg">One
-              outlier</button>
-          </div>
         </div>
       </div>
 

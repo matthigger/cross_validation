@@ -30,8 +30,6 @@ const state = {
   scheme: "shuffled",
   seed: DEFAULT_SEED,
   step: 0,
-  // Data set (a DATASETS key) chosen on each tab.
-  data: { class: "equal", reg: "equal" },
 };
 // Derived from k, scheme and seed by recompute().
 let order = [], rounds = [], colOf = [], foldOf = [];
@@ -40,7 +38,6 @@ const svg = document.getElementById("stage");
 const els = {};
 
 function recompute() {
-  PENGUINS = DATASETS[state.data[state.mode]];
   order = sampleOrder(N, state.scheme, state.seed, state.k);
   rounds = runCV(order, state.k);
   colOf = [];
@@ -85,10 +82,8 @@ function yText(sym, species) {
 }
 
 function tooltip(p) {
-  const odd = PENGUINS === DATASETS.outlier && p.id === OUTLIER_ID
-    ? " (recorded mass looks like a data-entry error)" : "";
   return `#${p.id} ${p.species}: bill ${p.billLen} × ${p.billDep} mm, `
-    + `flipper ${p.flipper} mm, ${fmt(p.mass)} g${odd}`;
+    + `flipper ${p.flipper} mm, ${fmt(p.mass)} g`;
 }
 
 /** Role of penguin i at the current step: idle, train or test. */
@@ -239,10 +234,6 @@ function regCell(p, err) {
   const zero = ERR_PX + 18;
   const h = Math.min(Math.abs(err), ERR_MAX) / ERR_MAX * ERR_PX;
   const y = err > 0 ? zero - h : zero;
-  // A bar clipped at ERR_MAX gets an arrow tip past its end.
-  const tip = Math.abs(err) <= ERR_MAX ? "" : err > 0
-    ? `<path class="bar" d="M-14 ${y} H14 L0 ${y - 10} Z"/>`
-    : `<path class="bar" d="M-14 ${y + h} H14 L0 ${y + h + 10} Z"/>`;
   return `<title>#${p.id}: actual ${fmt(p.mass)} g, estimate
       ${fmt(p.mass - err)} g, error ${signed(err)} g</title>
     <rect class="hl" x="-38" y="-16" width="76" height="${2 * ERR_PX + 70}"
@@ -250,7 +241,7 @@ function regCell(p, err) {
     <text class="id" y="0">#${p.id}</text>
     <line class="zero" x1="-30" x2="30" y1="${zero}" y2="${zero}"/>
     <rect class="bar" x="-14" y="${y}" width="28" height="${Math.max(h, 1)}"
-      rx="2"/>${tip}
+      rx="2"/>
     <text class="errval" y="${2 * ERR_PX + 42}">${signed(err)}</text>`;
 }
 
@@ -338,9 +329,7 @@ function updateReadout() {
     h += `<div class="row"><span>This round</span><span class="val">
         ${right(cur.test)} / ${cur.test.length} correct</span></div>
       <div class="row"><span>So far</span><span class="val">
-        ${right(seen)} / ${seen.length} correct</span></div>
-      <div class="row stack"><span>Detected so far, per species</span>
-        <span class="val">${detected(seen, right)}</span></div>`;
+        ${right(seen)} / ${seen.length} correct</span></div>`;
     if (state.step === k) {
       const c = right(seen);
       h += `<div class="final">CV accuracy = ${c} / ${N} =
@@ -352,11 +341,6 @@ function updateReadout() {
         ${fmt(Math.sqrt(mse(cur.test)))} g</span></div>
       <div class="row"><span>So far</span><span class="val">RMSE
         ${fmt(Math.sqrt(mse(seen)))} g</span></div>`;
-    const err = i => rounds[testRound(i) - 1].err[i];
-    const worst = seen.reduce((a, i) =>
-      Math.abs(err(i)) > Math.abs(err(a)) ? i : a);
-    h += `<div class="row"><span>Largest error so far</span><span
-      class="val">#${worst + 1}: ${signed(err(worst))} g</span></div>`;
     if (state.step === k) {
       const v = mse(seen);
       h += `<div class="final">CV MSE = ${fmt(v)} g&sup2;
@@ -364,17 +348,6 @@ function updateReadout() {
     }
   }
   out.innerHTML = h;
-}
-
-/** Per-species "correct / tested" among idx, e.g. "Adelie 3/3 &middot; ...". */
-function detected(idx, right) {
-  return SPECIES.map(sp => {
-    const t = idx.filter(i => PENGUINS[i].species === sp);
-    if (!t.length) return "";
-    const c = right(t);
-    const cls = c < t.length ? ' class="zero-ct"' : "";
-    return `<span${cls}>${sp} ${c}/${t.length}</span>`;
-  }).filter(Boolean).join(" &middot; ");
 }
 
 // -------------------------------------------------------------- controls
@@ -391,9 +364,6 @@ function updateControls() {
     !["shuffled", "stratified"].includes(state.scheme);
   for (const b of document.querySelectorAll("[data-order]")) {
     b.setAttribute("aria-checked", b.dataset.order === state.scheme);
-  }
-  for (const b of document.querySelectorAll("[data-data]")) {
-    b.setAttribute("aria-checked", b.dataset.data === state.data[state.mode]);
   }
   for (const t of document.querySelectorAll(".tab")) {
     t.setAttribute("aria-selected", t.dataset.mode === state.mode);
@@ -426,9 +396,8 @@ function setMode(mode) {
   if (!SCHEMES[mode].includes(state.scheme)) {
     state.scheme = "shuffled";
     state.step = 0;
+    recompute();
   }
-  // Each tab has its own data set, so the folds are always rebuilt.
-  recompute();
   history.replaceState(null, "", mode === "reg" ? "#regression"
     : "#classification");
   build();
@@ -443,15 +412,6 @@ for (const b of document.querySelectorAll("[data-order]")) {
   b.onclick = () => {
     state.scheme = b.dataset.order;
     refold();
-  };
-}
-for (const b of document.querySelectorAll("[data-data]")) {
-  b.onclick = () => {
-    state.data[state.mode] = b.dataset.data;
-    state.step = 0;
-    recompute();
-    build();
-    update();
   };
 }
 document.getElementById("reshuffle").onclick = () => {
