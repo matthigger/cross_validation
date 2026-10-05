@@ -143,10 +143,11 @@ function buildScatter() {
   h += `<rect class="frame" x="${PLOT.x0}" y="${PLOT.y0}"
     width="${PLOT.x1 - PLOT.x0}" height="${PLOT.y1 - PLOT.y0}"/>
     <text class="axis-label" x="${(PLOT.x0 + PLOT.x1) / 2}"
-      y="${PLOT.y1 + 36}" text-anchor="middle">flipper length (mm)</text>
+      y="${PLOT.y1 + 36}" text-anchor="middle">flipper length
+      <tspan class="sym">x</tspan> (mm)</text>
     <text class="axis-label" text-anchor="middle"
       transform="translate(24 ${(PLOT.y0 + PLOT.y1) / 2}) rotate(-90)">body
-      mass (g)</text>
+      mass <tspan class="sym">y</tspan> (g)</text>
     <text class="sec" x="${X0}" y="16">samples</text>
     <clipPath id="plotclip"><rect x="${PLOT.x0}" y="${PLOT.y0}"
       width="${PLOT.x1 - PLOT.x0}" height="${PLOT.y1 - PLOT.y0}"/></clipPath>`;
@@ -287,22 +288,28 @@ function updateReadout() {
     ? `${sp} ${cur.counts[sp]}`
     : `<span class="zero-ct">${sp} 0</span>`).join(" &middot; ");
   const missing = SPECIES.filter(sp => !cur.counts[sp]);
+  const xRange = idx => {
+    const xs = idx.map(i => PENGUINS[i].flipper);
+    return `${Math.min(...xs)} to ${Math.max(...xs)} mm`;
+  };
 
   let h = `<h3>Round ${state.step} of ${k}</h3>
     <div class="row"><span>Testing</span><span class="val">fold
       ${state.step}: ${cur.test.map(i => "#" + (i + 1)).join(" ")}</span>
     </div>
-    <div class="row"><span>Training</span><span class="val">${counts}</span>
-    </div>
+    ${state.mode === "class"
+      ? `<div class="row"><span>Training</span><span class="val">${counts}
+        </span></div>`
+      : `<div class="row"><span>Training <i>x</i></span><span class="val">
+        ${xRange(cur.train)}</span></div>
+        <div class="row"><span>Testing <i>x</i></span><span class="val">
+        ${xRange(cur.test)}</span></div>`}
     <div class="row"><span>Estimators trained</span><span class="val">
       ${state.step} of ${k}, each on ${cur.train.length} penguins</span>
     </div>`;
-  if (missing.length) {
-    h += `<p class="warn">No ${missing.join(" or ")} in training: ${
-      state.mode === "class"
-        ? "the estimator cannot output " + missing.join(" or ") + "."
-        : "the line is fit without " + (missing.length > 1 ? "them" : "it")
-          + "."}</p>`;
+  if (state.mode === "class" && missing.length) {
+    h += `<p class="warn">No ${missing.join(" or ")} in training: the
+      estimator cannot output ${missing.join(" or ")}.</p>`;
   }
 
   if (state.mode === "class") {
@@ -345,7 +352,8 @@ function updateControls() {
   kInput.value = K_CHOICES.indexOf(state.k);
   document.getElementById("back").disabled = state.step === 0;
   document.getElementById("step").disabled = state.step === state.k;
-  document.getElementById("reshuffle").disabled = state.scheme === "sorted";
+  document.getElementById("reshuffle").disabled =
+    !["shuffled", "stratified"].includes(state.scheme);
   for (const b of document.querySelectorAll("[data-order]")) {
     b.setAttribute("aria-checked", b.dataset.order === state.scheme);
   }
@@ -369,10 +377,15 @@ function refold() {
   update();
 }
 
+// Fold schemes offered on each tab; switching tabs falls back to shuffled.
+const SCHEMES = {
+  class: ["sorted", "shuffled", "stratified"],
+  reg: ["sortx", "sorty", "shuffled"],
+};
+
 function setMode(mode) {
   state.mode = mode;
-  // Stratifying by species is a classification idea; regression falls back.
-  if (mode === "reg" && state.scheme === "stratified") {
+  if (!SCHEMES[mode].includes(state.scheme)) {
     state.scheme = "shuffled";
     state.step = 0;
     recompute();

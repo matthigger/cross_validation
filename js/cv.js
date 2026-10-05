@@ -15,7 +15,8 @@ function rng(seed) {
 /**
  * Return 0..n-1 in the display order for a fold scheme.
  *
- * sorted lists by species; shuffled is a seeded Fisher-Yates shuffle;
+ * sorted lists by species; sortx / sorty sort by flipper length / body
+ * mass (ties by id); shuffled is a seeded Fisher-Yates shuffle;
  * stratified shuffles within each species, deals the species-grouped list
  * round-robin into k folds (so per-fold species counts differ by at most
  * one), then lays the folds end to end, each listed by species.
@@ -23,6 +24,10 @@ function rng(seed) {
 function sampleOrder(n, scheme, seed, k) {
   const order = [...Array(n).keys()];
   if (scheme === "sorted") return order;
+  if (scheme === "sortx" || scheme === "sorty") {
+    const key = scheme === "sortx" ? "flipper" : "mass";
+    return order.sort((a, b) => PENGUINS[a][key] - PENGUINS[b][key] || a - b);
+  }
   const r = rng(seed);
   for (let i = n - 1; i > 0; i--) {
     const j = Math.floor(r() * (i + 1));

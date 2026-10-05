@@ -12,8 +12,9 @@
 <body>
   <header>
     <h1>Cross validation, visually</h1>
-    <p class="sub">How well does an estimator do on penguins it has never
-      seen? Find out using only the penguins you have.</p>
+    <p class="sub">How well does an estimator do on samples it has never
+      seen? To quantify this, we'll need to observe its performance on
+      &ldquo;new&rdquo; (to the estimator, at least) samples.</p>
     <nav class="tabs" role="tablist">
       <button class="tab" role="tab" data-mode="class">Classification</button>
       <button class="tab" role="tab" data-mode="reg">Regression</button>
@@ -54,12 +55,14 @@
       </div>
       <div data-show="reg">
         <div class="notation">
-          <span>Each penguin <i>i</i> has a label <i>y<sub>i</sub></i>:</span>
-          <span class="labels"><span><i>y<sub>i</sub></i> = body mass
-            (g)</span></span>
-          <span>and an estimate <i>&ycirc;<sub>i</sub></i> from its flipper
-            length. The error is <i>y<sub>i</sub></i> &minus;
-            <i>&ycirc;<sub>i</sub></i>.</span>
+          <span>Each penguin <i>i</i> has a feature and a label:</span>
+          <span class="labels">
+            <span><i>x<sub>i</sub></i> = flipper length (mm)</span>
+            <span><i>y<sub>i</sub></i> = body mass (g)</span>
+          </span>
+          <span>Its estimate <i>&ycirc;<sub>i</sub></i> comes from
+            <i>x<sub>i</sub></i>, and its error is <i>y<sub>i</sub></i>
+            &minus; <i>&ycirc;<sub>i</sub></i>.</span>
         </div>
         <div class="formula">
           CV MSE = <span class="frac"><span>1</span><span><i>n</i></span></span>
@@ -89,7 +92,20 @@
         <li data-show="reg">Watch the line from round to round. It shifts a
           little, because each round fits it to different penguins. A
           testing penguin far from its line gets a tall error bar.</li>
-        <li>Set <i>k</i>&nbsp;=&nbsp;12 (leave-one-out): twelve rounds, each
+        <li data-show="reg">Switch to <em>Sorted by x</em> or <em>Sorted
+          by y</em> with <i>k</i>&nbsp;=&nbsp;3. Why could sorting cause
+          trouble, and what should you do about it?
+          <details class="answer"><summary>Answer</summary>Each testing
+            fold holds only the smallest, middle or largest values, so the
+            line is fit on penguins unlike the ones it is tested on. It has to
+            extrapolate, the errors in the end folds mostly share one sign,
+            and the CV error comes out too large: at
+            <i>k</i>&nbsp;=&nbsp;3, an RMSE of roughly 470 to 500 g against
+            about 350 g when shuffled. Shuffle the samples before splitting
+            them into folds.</details>
+        </li>
+        <li data-show="class">Set <i>k</i>&nbsp;=&nbsp;12
+          (leave-one-out): twelve rounds, each
           testing one penguin, and the result no longer depends on the
           order. What is the downside? Going from <i>k</i>&nbsp;=&nbsp;6 to
           <i>k</i>&nbsp;=&nbsp;12, how many more penguins does each
@@ -137,8 +153,13 @@
         <div class="order">
           <span>Order</span>
           <div class="seg" role="radiogroup">
-            <button data-order="sorted" role="radio">Sorted by
+            <button data-order="sorted" role="radio"
+              data-show="class">Sorted by
               species</button>
+            <button data-order="sortx" role="radio" data-show="reg">Sorted
+              by <i>x</i></button>
+            <button data-order="sorty" role="radio" data-show="reg">Sorted
+              by <i>y</i></button>
             <button data-order="shuffled" role="radio">Shuffled</button>
             <button data-order="stratified" role="radio"
               data-show="class">Stratified</button>
