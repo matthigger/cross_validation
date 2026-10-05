@@ -12,16 +12,29 @@ function rng(seed) {
   };
 }
 
-/** Return 0..n-1 in species order, or Fisher-Yates shuffled by seed. */
-function sampleOrder(n, shuffled, seed) {
+/**
+ * Return 0..n-1 in the display order for a fold scheme.
+ *
+ * sorted lists by species; shuffled is a seeded Fisher-Yates shuffle;
+ * stratified shuffles within each species, deals the species-grouped list
+ * round-robin into k folds (so per-fold species counts differ by at most
+ * one), then lays the folds end to end, each listed by species.
+ */
+function sampleOrder(n, scheme, seed, k) {
   const order = [...Array(n).keys()];
-  if (!shuffled) return order;
+  if (scheme === "sorted") return order;
   const r = rng(seed);
   for (let i = n - 1; i > 0; i--) {
     const j = Math.floor(r() * (i + 1));
     [order[i], order[j]] = [order[j], order[i]];
   }
-  return order;
+  if (scheme === "shuffled") return order;
+  const bySpecies = SPECIES.flatMap(sp =>
+    order.filter(i => PENGUINS[i].species === sp));
+  const folds = [...Array(k)].map(() => []);
+  bySpecies.forEach((i, t) => folds[t % k].push(i));
+  const rank = i => SPECIES.indexOf(PENGUINS[i].species);
+  return folds.flatMap(f => f.sort((a, b) => rank(a) - rank(b)));
 }
 
 /** Split order into k contiguous folds; k divides n for every k offered. */

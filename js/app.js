@@ -27,18 +27,18 @@ const LAYOUT = {
 const state = {
   mode: "class",
   k: 3,
-  shuffled: true,
+  scheme: "shuffled",
   seed: DEFAULT_SEED,
   step: 0,
 };
-// Derived from k, shuffled and seed by recompute().
+// Derived from k, scheme and seed by recompute().
 let order = [], rounds = [], colOf = [];
 
 const svg = document.getElementById("stage");
 const els = {};
 
 function recompute() {
-  order = sampleOrder(N, state.shuffled, state.seed);
+  order = sampleOrder(N, state.scheme, state.seed, state.k);
   rounds = runCV(order, state.k);
   colOf = [];
   order.forEach((i, j) => { colOf[i] = j; });
@@ -343,10 +343,9 @@ function updateControls() {
   kInput.value = K_CHOICES.indexOf(state.k);
   document.getElementById("back").disabled = state.step === 0;
   document.getElementById("step").disabled = state.step === state.k;
-  document.getElementById("reshuffle").disabled = !state.shuffled;
+  document.getElementById("reshuffle").disabled = state.scheme === "sorted";
   for (const b of document.querySelectorAll("[data-order]")) {
-    b.setAttribute("aria-checked",
-      (b.dataset.order === "shuffled") === state.shuffled);
+    b.setAttribute("aria-checked", b.dataset.order === state.scheme);
   }
   for (const t of document.querySelectorAll(".tab")) {
     t.setAttribute("aria-selected", t.dataset.mode === state.mode);
@@ -370,6 +369,12 @@ function refold() {
 
 function setMode(mode) {
   state.mode = mode;
+  // Stratifying by species is a classification idea; regression falls back.
+  if (mode === "reg" && state.scheme === "stratified") {
+    state.scheme = "shuffled";
+    state.step = 0;
+    recompute();
+  }
   history.replaceState(null, "", mode === "reg" ? "#regression"
     : "#classification");
   build();
@@ -382,7 +387,7 @@ document.getElementById("reset").onclick = () => setStep(0);
 kInput.oninput = () => { state.k = K_CHOICES[+kInput.value]; refold(); };
 for (const b of document.querySelectorAll("[data-order]")) {
   b.onclick = () => {
-    state.shuffled = b.dataset.order === "shuffled";
+    state.scheme = b.dataset.order;
     refold();
   };
 }
