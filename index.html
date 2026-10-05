@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Cross validation, visually</title>
+  <meta name="description" content="Step through k-fold cross validation on
+    twelve penguins, for classification and regression.">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect x='2' y='8' width='9' height='16' rx='2' fill='%23bfdbfe' stroke='%231d4ed8'/%3E%3Crect x='12' y='8' width='9' height='16' rx='2' fill='%23bfdbfe' stroke='%231d4ed8'/%3E%3Crect x='22' y='8' width='8' height='16' rx='2' fill='%23bbf7d0' stroke='%2315803d'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <h1>Cross validation, visually</h1>
+    <p class="sub">How well does a model do on penguins it has never seen?
+      Estimate it with the penguins you have.</p>
+    <nav class="tabs" role="tablist">
+      <button class="tab" role="tab" data-mode="class">Classification</button>
+      <button class="tab" role="tab" data-mode="reg">Regression</button>
+    </nav>
+  </header>
+
+  <main class="panel">
+    <div class="stage card">
+      <div class="stage-head">
+        <span class="key"><span class="swatch train"></span>training</span>
+        <span class="key"><span class="swatch test"></span>testing</span>
+        <span class="round" id="round"></span>
+      </div>
+      <svg id="stage" aria-label="Cross validation folds and estimates"></svg>
+      <div class="species-key" data-show="class">
+        <span><svg viewBox="0 0 100 140"></svg>Adelie: eye rings</span>
+        <span><svg viewBox="0 0 100 140"></svg>Chinstrap: chin strap</span>
+        <span><svg viewBox="0 0 100 140"></svg>Gentoo: crown band,
+          orange bill</span>
+      </div>
+    </div>
+
+    <aside class="side">
+      <div class="card controls">
+        <div class="buttons step-buttons">
+          <button id="back" title="Back one round (left arrow)">&#9664;
+            Back</button>
+          <button id="step" class="primary"
+            title="Next round (right arrow or space)">CV step &#9654;</button>
+          <button id="reset">Reset</button>
+        </div>
+        <label class="slider"><span>Folds</span>
+          <input type="range" id="k" min="0" max="4" step="1">
+          <span id="kval" class="val"></span></label>
+        <div class="order">
+          <span>Order</span>
+          <div class="seg" role="radiogroup">
+            <button data-order="sorted" role="radio">Sorted by
+              species</button>
+            <button data-order="shuffled" role="radio">Shuffled</button>
+          </div>
+          <button id="reshuffle" title="Draw a new random order">&#8635;
+            Reshuffle</button>
+        </div>
+      </div>
+
+      <div class="card readout" id="readout"></div>
+
+      <div class="card">
+        <h2><i>k</i>-fold cross validation</h2>
+        <p>Split the samples into <i>k</i> folds. Each round, train the
+          model on <i>k</i>&minus;1 folds
+          (<span class="tr">training</span>) and use it to estimate the
+          one fold left out (<span class="te">testing</span>). After
+          <i>k</i> rounds every sample has exactly one estimate, made by a
+          model that never saw it.</p>
+
+        <div data-show="class">
+          <p><b>Model:</b> nearest centroid. Average the bill length and
+            bill depth of each species in the training folds; estimate a
+            penguin as the species whose average is closest.</p>
+          <div class="formula">
+            CV accuracy = <span class="frac"><span>1</span><span><i>n</i></span></span>
+            &sum;<sub><i>i</i></sub> 1[ <i>&ycirc;<sub>i</sub></i> =
+            <i>y<sub>i</sub></i> ]
+          </div>
+        </div>
+        <div data-show="reg">
+          <p><b>Model:</b> least squares line, body mass &asymp;
+            <i>&beta;</i><sub>0</sub> + <i>&beta;</i><sub>1</sub> &middot;
+            flipper length, fit on the training folds. Each estimate's
+            error is <i>y<sub>i</sub></i> &minus; <i>&ycirc;<sub>i</sub></i>
+            (actual minus estimate).</p>
+          <div class="formula">
+            CV MSE = <span class="frac"><span>1</span><span><i>n</i></span></span>
+            &sum;<sub><i>i</i></sub> (<i>y<sub>i</sub></i> &minus;
+            <i>&ycirc;<sub>i</sub></i>)<sup>2</sup>
+          </div>
+        </div>
+        <p class="muted">Here <i>&ycirc;<sub>i</sub></i> always comes from
+          the round where sample <i>i</i> was testing.</p>
+
+        <h3>Try this</h3>
+        <ul class="try">
+          <li>Step through every round: each penguin is testing exactly
+            once, and its estimate stays put afterwards.</li>
+          <li>Switch to <em>Sorted by species</em> with <i>k</i> = 3. Each
+            testing fold is one species, and that species is missing from
+            training.
+            <span data-show="class">The model cannot estimate a species it
+              never saw, so every estimate is wrong.</span>
+            <span data-show="reg">The line must extrapolate to penguins
+              unlike any it was fit on, so the errors grow.</span></li>
+          <li>Back to <em>Shuffled</em>, set <i>k</i> = 2 and reshuffle a
+            few times. Most orders are fine, but some leave a fold short
+            of one species. Stratified folds avoid this by giving every
+            fold the same mix of species.</li>
+          <li>Set <i>k</i> = 12: leave-one-out. Twelve rounds, each
+            testing one penguin, and the result no longer depends on the
+            order.</li>
+        </ul>
+      </div>
+    </aside>
+  </main>
+
+  <footer>
+    Data: twelve penguins from the Palmer Archipelago (Gorman, Williams
+    &amp; Fraser 2014), via
+    <a href="https://allisonhorst.github.io/palmerpenguins/">palmerpenguins</a>.
+    &middot;
+    <a href="https://github.com/matthigger/cross_validation">Source on
+      GitHub</a>
+  </footer>
+
+  <script src="js/penguin.js"></script>
+  <script src="js/data.js"></script>
+  <script src="js/cv.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
