@@ -234,6 +234,10 @@ function regCell(p, err) {
   const zero = ERR_PX + 18;
   const h = Math.min(Math.abs(err), ERR_MAX) / ERR_MAX * ERR_PX;
   const y = err > 0 ? zero - h : zero;
+  // A bar clipped at ERR_MAX gets an arrow tip past its end.
+  const tip = Math.abs(err) <= ERR_MAX ? "" : err > 0
+    ? `<path class="bar" d="M-14 ${y} H14 L0 ${y - 10} Z"/>`
+    : `<path class="bar" d="M-14 ${y + h} H14 L0 ${y + h + 10} Z"/>`;
   return `<title>#${p.id}: actual ${fmt(p.mass)} g, estimate
       ${fmt(p.mass - err)} g, error ${signed(err)} g</title>
     <rect class="hl" x="-38" y="-16" width="76" height="${2 * ERR_PX + 70}"
@@ -241,7 +245,7 @@ function regCell(p, err) {
     <text class="id" y="0">#${p.id}</text>
     <line class="zero" x1="-30" x2="30" y1="${zero}" y2="${zero}"/>
     <rect class="bar" x="-14" y="${y}" width="28" height="${Math.max(h, 1)}"
-      rx="2"/>
+      rx="2"/>${tip}
     <text class="errval" y="${2 * ERR_PX + 42}">${signed(err)}</text>`;
 }
 
