@@ -93,6 +93,18 @@ h1 { font-size: 2rem; margin: 0 0 2px; letter-spacing: -0.015em; }
 .frac > span:last-child { padding-top: 1px; }
 ul.try { margin: 0 0 10px; padding-left: 1.1em; }
 ul.try li { margin: 3px 0; }
+.answer { margin: 4px 0 2px; }
+.answer summary {
+  cursor: pointer;
+  color: var(--train-ink);
+  font-weight: 600;
+  width: max-content;
+}
+.answer[open] {
+  background: #f6f7fa;
+  border-radius: 8px;
+  padding: 4px 10px 6px;
+}
 .readout { font-variant-numeric: tabular-nums; }
 .readout .row {
   display: flex;

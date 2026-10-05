@@ -117,7 +117,8 @@ function build() {
   svg.append(node("text", { class: "sec", x: X0, y: L.estLabel },
     state.mode === "class"
       ? `estimates <tspan class="sym">ŷ</tspan> per sample`
-      : "error per sample: actual − estimate (g)"));
+      : `error per sample: <tspan class="sym">y</tspan> −
+        <tspan class="sym">ŷ</tspan> (g)`));
 
   for (const p of PENGUINS) {
     const g = node("g", { class: "col est", "data-i": p.id - 1 });
@@ -292,6 +293,9 @@ function updateReadout() {
       ${state.step}: ${cur.test.map(i => "#" + (i + 1)).join(" ")}</span>
     </div>
     <div class="row"><span>Training</span><span class="val">${counts}</span>
+    </div>
+    <div class="row"><span>Models trained</span><span class="val">
+      ${state.step} of ${k}, each on ${cur.train.length} penguins</span>
     </div>`;
   if (missing.length) {
     h += `<p class="warn">No ${missing.join(" or ")} in training: ${

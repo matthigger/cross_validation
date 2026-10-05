@@ -73,10 +73,10 @@
         <li>Step through every round: each penguin is testing exactly once,
           and its estimate stays put afterwards.</li>
         <li data-show="class">Switch to <em>Sorted by species</em> with
-          <i>k</i> = 3. Each testing fold is one species, and that species is
+          <i>k</i>&nbsp;=&nbsp;3. Each testing fold is one species, and that species is
           missing from training. The model cannot estimate a species it
           never saw, so every estimate is wrong.</li>
-        <li data-show="class">Back to <em>Shuffled</em>, set <i>k</i> = 2 and
+        <li data-show="class">Back to <em>Shuffled</em>, set <i>k</i>&nbsp;=&nbsp;2 and
           reshuffle a few times. Most orders are fine, but some leave a fold
           short of one species.</li>
         <li data-show="class">Choose <em>Stratified</em>: every fold gets the
@@ -85,8 +85,16 @@
         <li data-show="reg">Watch the line from round to round: it moves a
           little, because each round fits it on different penguins. A
           testing penguin far from its line gets a tall error bar.</li>
-        <li>Set <i>k</i> = 12: leave-one-out. Twelve rounds, each testing one
-          penguin, and the result no longer depends on the order.</li>
+        <li>Set <i>k</i>&nbsp;=&nbsp;12: leave-one-out. Twelve rounds, each testing one
+          penguin, and the result no longer depends on the order. What is
+          the downside? Going from <i>k</i>&nbsp;=&nbsp;6 to <i>k</i>&nbsp;=&nbsp;12, how many
+          more penguins does each model train on, and how many more models
+          are trained?
+          <details class="answer"><summary>Answer</summary>Each model
+            trains on <i>n</i> &minus; <i>n</i>/<i>k</i> penguins: 10 at
+            <i>k</i>&nbsp;=&nbsp;6, 11 at <i>k</i>&nbsp;=&nbsp;12. One more penguin per model,
+            but 12 models instead of 6, so twice the training time.</details>
+        </li>
       </ul>
     </div>
   </section>
