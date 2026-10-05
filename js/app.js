@@ -452,8 +452,7 @@ document.querySelectorAll(".species-key svg").forEach((s, j) => {
   s.innerHTML = penguinSVG(SPECIES[j]);
 });
 
-// Footer build stamp: the deployed commit, linked, so a viewer can check
-// it against the latest commit on GitHub.
+// Footer build stamp: the deployed commit (linked) and build time.
 (function () {
   const el = document.getElementById("build");
   const repo = "https://github.com/matthigger/cross_validation";
@@ -461,8 +460,7 @@ document.querySelectorAll(".species-key svg").forEach((s, j) => {
   const when = new Date(BUILD.time).toLocaleString("en-US", {
     dateStyle: "medium", timeStyle: "short" });
   el.innerHTML = `build <a href="${repo}/commit/${BUILD.sha}">${
-    BUILD.sha.slice(0, 7)}</a>, ${when} (<a href="${repo}/commits/main">latest
-    commits</a>)`;
+    BUILD.sha.slice(0, 7)}</a>, ${when}`;
 })();
 
 recompute();
