@@ -39,10 +39,13 @@ Link straight to a tab with `index.html#classification` or
 
 ## Publish on GitHub Pages
 
+Pages is built by `.github/workflows/pages.yml` on every push to `main`. It
+stamps `js/version.js` with the commit and build time, which the footer
+shows ("local copy" when run locally). One-time setup:
+
 ```sh
 gh repo create matthigger/cross_validation --public --source . --push
-gh api -X POST repos/matthigger/cross_validation/pages \
-  -f 'source[branch]=main' -f 'source[path]=/'
+gh api -X POST repos/matthigger/cross_validation/pages -f build_type=workflow
 ```
 
 The site then lives at <https://matthigger.github.io/cross_validation/>.
@@ -56,4 +59,6 @@ The site then lives at <https://matthigger.github.io/cross_validation/>.
 | `js/data.js` | the twelve penguins (Gorman, Williams & Fraser 2014) |
 | `js/penguin.js` | penguin outline per species |
 | `js/cv.js` | fold schemes, nearest centroid, least squares |
-| `js/app.js` | state, drawing, controls |
+| `js/app.js` | state, drawing, controls, footer build stamp |
+| `js/version.js` | build stamp, overwritten at deploy |
+| `.github/workflows/pages.yml` | Pages deploy |
